@@ -8,6 +8,8 @@ This application requires the following environment variables to be configured i
 
 - `JWT_SECRET`: A secret key for JWT token signing and verification
 - `DATABASE_URL`: Database connection string (SQLite file path)
+- `NODE_ENV`: Set to `production` in production (optional, but recommended)
+- `PORT`: Port number (Render sets this automatically)
 
 ### For Render.com Deployment
 
@@ -19,6 +21,7 @@ This application requires the following environment variables to be configured i
 ```
 JWT_SECRET=your-secret-key-here
 DATABASE_URL=file:./dev.db
+NODE_ENV=production
 ```
 
 ### Generating a JWT Secret
