@@ -9,7 +9,7 @@ export async function authenticate(
     const user = await request.jwtVerify();
 
     // 🔥 ESSENCIAL: salvar no request
-    request.user = user;
+    request.user = user as any;
   } catch (err) {
     return reply.code(401).send({ message: "Não autorizado" });
   }
