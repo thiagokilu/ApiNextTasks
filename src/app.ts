@@ -21,7 +21,7 @@ export const app = Fastify({ logger: true });
 
 
 app.register(cors, {
-  origin: "https://next-tasks-seven-lovat.vercel.app/",
+  origin: "https://next-tasks-seven-lovat.vercel.app",
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 });
