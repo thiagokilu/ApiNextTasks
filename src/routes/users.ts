@@ -28,7 +28,7 @@ app.post(
     // ✅ validação básica (evita erro do Prisma)
     if (!title || title.trim() === "") {
       return reply.status(400).send({
-        message: "Título da tarefa é obrigatório",
+        message: "Título da tarefa é obrigatório!",
       });
     }
 
