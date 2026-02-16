@@ -24,12 +24,13 @@ app.register(cors, {
 await app.register(cookie); // ✅ NOVO
 
 app.register(jwt, {
-  secret: process.env.JWT_SECRET_KEY as string,
+  secret: process.env.JWT_SECRET as string,
   cookie: {
     cookieName: "token",
     signed: false,
   },
 });
+
 
 
 app.decorate("authenticate", authenticate);
