@@ -1,54 +1,61 @@
 import type { FastifyInstance } from "fastify";
 import bcrypt from "bcrypt";
 import { prisma } from "../lib/prisma.js";
-import cookie from "@fastify/cookie";
 
 export default async function authRoutes(app: FastifyInstance) {
-app.post("/login", async (request, reply) => {
-  const { email, password } = request.body as {
-    email: string;
-    password: string;
-  };
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    return reply.code(401).send({ message: "Invalid credentials" });
-  }
+  // ==========================
+  // LOGIN
+  // ==========================
+  app.post("/login", async (request, reply) => {
+    const { email, password } = request.body as {
+      email: string;
+      password: string;
+    };
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) {
-    return reply.code(401).send({ message: "Invalid credentials" });
-  }
+    const user = await prisma.user.findUnique({ where: { email } });
 
-  const token = app.jwt.sign({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  });
+    if (!user) {
+      return reply.code(401).send({ message: "Invalid credentials" });
+    }
 
-  return reply
-  .setCookie("token", token, {
-    httpOnly: true,
-    secure: false, // true em produção
-    sameSite: "lax",
-    path: "/",
-  })
-  .send({
-    user: {
+    const valid = await bcrypt.compare(password, user.password);
+
+    if (!valid) {
+      return reply.code(401).send({ message: "Invalid credentials" });
+    }
+
+    const token = app.jwt.sign({
       id: user.id,
       name: user.name,
       email: user.email,
-    },
+      role: user.role,
+    });
+
+    return reply
+      .setCookie("token", token, {
+        httpOnly: true,
+        secure: true,        // 🔥 OBRIGATÓRIO EM PRODUÇÃO
+        sameSite: "none",    // 🔥 OBRIGATÓRIO PARA DOMÍNIOS DIFERENTES
+        path: "/",
+      })
+      .send({
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+      });
   });
 
-});
-
-
+  // ==========================
+  // SIGNUP
+  // ==========================
   app.post("/signup", async (request, reply) => {
     const { name, email, password } = request.body as any;
 
     const exists = await prisma.user.findUnique({ where: { email } });
+
     if (exists) {
       return reply.code(400).send({ message: "Email já cadastrado" });
     }
@@ -62,23 +69,31 @@ app.post("/login", async (request, reply) => {
       },
     });
 
-    return reply.code(201).send(user);
+    return reply.code(201).send({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    });
   });
 
-  app.get("/users", async (request, reply) => {
-  const users = await prisma.user.findMany();
-  return reply.send(users);
-});
+  // ==========================
+  // ROTA PROTEGIDA
+  // ==========================
+  app.get("/me", { preHandler: [app.authenticate] }, async (request, reply) => {
+    return reply.send(request.user);
+  });
 
-app.post("/logout", async (_request, reply) => {
-  reply
-    .clearCookie("token", {
-      path: "/",
-    })
-    .status(200)
-    .send({ message: "Logout realizado" });
-});
-
+  // ==========================
+  // LOGOUT
+  // ==========================
+  app.post("/logout", async (_request, reply) => {
+    reply
+      .clearCookie("token", {
+        path: "/",
+        secure: true,
+        sameSite: "none",
+      })
+      .status(200)
+      .send({ message: "Logout realizado" });
+  });
 }
-
-
