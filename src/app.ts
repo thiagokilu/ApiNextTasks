@@ -21,10 +21,22 @@ export const app = Fastify({ logger: true });
 
 
 app.register(cors, {
-  origin: "https://next-tasks-seven-lovat.vercel.app",
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "https://next-tasks-seven-lovat.vercel.app",
+      "http://localhost:3000",
+    ];
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error("Not allowed by CORS"), false);
+  },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 });
+
 
 await app.register(cookie); // ✅ NOVO
 
