@@ -9,7 +9,7 @@ export default async function userRoutes(app: FastifyInstance) {
     });
   });
 
-  app.get("/me", { onRequest: [authenticate] }, async request => {
+  app.get("/me", { onRequest: [authenticate] }, async (request: any) => {
     return request.user;
   });
 
@@ -18,7 +18,7 @@ export default async function userRoutes(app: FastifyInstance) {
 app.post(
   "/newTask",
   { onRequest: [authenticate] },
-  async (request, reply) => {
+  async (request: any, reply) => {
     const { title, description, deadline } = request.body as {
       title: string;
       description?: string;
@@ -64,7 +64,7 @@ app.post(
   }
 );
 
-app.get("/tasks", { onRequest: [authenticate] }, async (request, reply) => {
+app.get("/tasks", { onRequest: [authenticate] }, async (request: any, reply) => {
   const tasks = await prisma.task.findMany({
     where: {
       userId: request.user.id,
@@ -81,7 +81,7 @@ app.get("/tasks", { onRequest: [authenticate] }, async (request, reply) => {
   return reply.send(tasks);
 });
 
-app.put("/tasks/:id", { onRequest: [authenticate] }, async (request, reply) => {
+app.put("/tasks/:id", { onRequest: [authenticate] }, async (request: any, reply) => {
   const { id } = request.params as { id: string };
   const { title, description, deadline, completed } = request.body as any;
 
@@ -111,7 +111,7 @@ app.put("/tasks/:id", { onRequest: [authenticate] }, async (request, reply) => {
 app.patch(
   "/tasks/:id/complete",
   { onRequest: [authenticate] },
-  async (request, reply) => {
+  async (request: any, reply) => {
     const { id } = request.params as { id: string };
     const taskId = Number(id);
 
@@ -142,7 +142,7 @@ app.patch(
 app.delete(
   "/tasks/:id",
   { onRequest: [authenticate] },
-  async (request, reply) => {
+  async (request: any, reply) => {
     const { id } = request.params as { id: string };
 
     try {
