@@ -11,6 +11,11 @@ import { authenticate } from "./plugins/authenticate.js";
 
 dotenv.config();
 
+// Verificação crítica para variáveis de ambiente
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is required. Please set it in your environment.");
+}
+
 export const app = Fastify({ logger: true });
 
 
