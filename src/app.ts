@@ -27,13 +27,20 @@ app.register(cors, {
     const allowedOrigins = [
       "https://next-tasks-seven-lovat.vercel.app",
       "http://localhost:3000",
+      "http://localhost:3001",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3001",
     ];
+
+    // Log para debug
+    console.log("CORS Origin:", origin);
 
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
       return;
     }
 
+    console.log("CORS blocked for origin:", origin);
     callback(new Error("Not allowed by CORS"), false);
   },
   credentials: true,
